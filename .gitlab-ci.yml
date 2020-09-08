@@ -1,0 +1,42 @@
+image: python:3-slim
+
+stages:
+  - test
+  - deploy
+  - publish
+
+test:
+  stage: test
+  script:
+    - apt-get update
+    - apt-get install --no-install-recommends -y curl build-essential
+    - curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
+    - source $HOME/.cargo/env
+    - pip install pipenv
+    - pipenv sync --dev
+    - cargo build --lib --features python
+    - cargo test
+    - ln -s target/debug/libfafreplay.so ./fafreplay.so
+    - pipenv run tests -m "not release"
+  only:
+    - merge_requests
+    - tags
+
+build-wheels:
+  image: quay.io/pypa/manylinux2010_x86_64
+  stage: deploy
+  script:
+    - ./build-wheels.sh
+  artifacts:
+    paths:
+      - dist
+  only:
+    - tags
+
+pypi-upload:
+  stage: publish
+  script:
+    - pip install twine
+    - twine upload dist/*manylinux*
+  only:
+    - tags

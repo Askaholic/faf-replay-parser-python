@@ -1,0 +1,16 @@
+[package]
+name = "faf-replay-parser-python"
+version = "0.4.0"
+authors = ["Askaholic"]
+license = "LGPL-3.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "fafreplay"
+crate-type = ["lib", "cdylib"]
+
+[dependencies]
+faf-replay-parser = { path = "../faf-replay-parser" }
+pyo3 = { version = "0.11", features = ["extension-module"] }
