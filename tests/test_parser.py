@@ -45,13 +45,35 @@ def test_constructor_list():
 
 def test_constructor_tuple():
     Parser(
-        limit=10,
         commands=(
             commands.Advance,
             commands.VerifyChecksum,
         ),
-        save_commands=False,
-        stop_on_desync=False
+    )
+
+
+def test_constructor_set():
+    Parser(
+        commands={
+            commands.Advance,
+            commands.VerifyChecksum,
+        },
+    )
+
+
+def test_constructor_iterable():
+    class TestIterable:
+        def __init__(self):
+            self.data = iter((commands.Advance, commands.VerifyChecksum))
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            return next(self.data)
+
+    Parser(
+        commands=TestIterable(),
     )
 
 
@@ -75,7 +97,7 @@ def test_constructor_error_commands():
     with pytest.raises(TypeError):
         Parser(commands=10)
     with pytest.raises(TypeError):
-        Parser(commands={commands.Advance, commands.WarpEntity})
+        Parser(commands=object())
 
 
 def test_constructor_error_save_commands():

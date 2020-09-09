@@ -3,7 +3,9 @@ use pyo3::types::{PyBytes, PyDict};
 use std::collections::HashMap;
 
 pub struct LuaObject(pub faf_replay_parser::lua::LuaObject);
-pub struct LuaTable(pub HashMap<faf_replay_parser::lua::LuaObject, faf_replay_parser::lua::LuaObject>);
+pub struct LuaTable(
+    pub HashMap<faf_replay_parser::lua::LuaObject, faf_replay_parser::lua::LuaObject>,
+);
 
 impl IntoPy<PyObject> for LuaObject {
     fn into_py(self, py: Python) -> PyObject {
@@ -33,8 +35,10 @@ impl IntoPy<PyObject> for LuaTable {
     }
 }
 
-
-pub fn table_into_py<K: IntoPy<PyObject>>(table: HashMap<K, faf_replay_parser::lua::LuaObject>, py: Python) -> PyObject {
+pub fn table_into_py<K: IntoPy<PyObject>>(
+    table: HashMap<K, faf_replay_parser::lua::LuaObject>,
+    py: Python,
+) -> PyObject {
     let res = PyDict::new(py);
 
     for (k, v) in table {

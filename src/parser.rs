@@ -1,7 +1,7 @@
-use pyo3::exceptions;
+use pyo3::exceptions::TypeError;
 use pyo3::prelude::*;
 use pyo3::type_object::PyTypeInfo;
-use pyo3::types::{PyBytes, PyList, PyLong, PyTuple};
+use pyo3::types::{PyBytes, PyLong};
 
 use crate::convert_result;
 use crate::replay::{Replay, ReplayBody, ReplayHeader};
@@ -25,26 +25,21 @@ impl ParserWrap {
         // Configure ParserBuilder from arguments
         let mut builder = ParserBuilder::new().limit(limit);
         if let Some(seq) = commands {
-            if PyTuple::is_instance(seq) {
-                let seq = seq.downcast::<PyTuple>().unwrap();
-                let mut commands = Vec::with_capacity(seq.len());
-                for any in seq.iter() {
-                    commands.push(any.downcast::<PyLong>()?.extract()?);
-                }
-                builder = builder.commands(&commands);
-            } else if PyList::is_instance(seq) {
-                // Exactly the same as above
-                let seq = seq.downcast::<PyList>().unwrap();
-                let mut commands = Vec::with_capacity(seq.len());
-                for any in seq.iter() {
-                    commands.push(any.downcast::<PyLong>()?.extract()?);
-                }
-                builder = builder.commands(&commands);
-            } else {
-                return Err(PyErr::new::<exceptions::TypeError, _>(
-                    "'commands' must be list or tuple",
-                ));
+            let mut commands = match seq.len() {
+                Ok(len) => Vec::with_capacity(len),
+                Err(_) => Vec::new(),
+            };
+            for any in seq
+                .iter()
+                .map_err(|_| TypeError::py_err("'commands' must be iterable"))?
+            {
+                commands.push(
+                    any?.downcast::<PyLong>()
+                        .map_err(|_| TypeError::py_err("command must be an integer"))?
+                        .extract()?,
+                );
             }
+            builder = builder.commands(&commands);
         } else {
             builder = builder.commands_default();
         }
@@ -64,20 +59,26 @@ impl ParserWrap {
     #[text_signature = "(data)"]
     fn parse(&self, py: Python, data: &PyBytes) -> PyResult<Replay> {
         let mut bytes = data.as_bytes();
-        Ok(Replay(py.allow_threads(|| convert_result(self.parser.parse(&mut bytes)))?))
+        Ok(Replay(py.allow_threads(|| {
+            convert_result(self.parser.parse(&mut bytes))
+        })?))
     }
 
     /// Parse a replay header
     #[text_signature = "(data)"]
     fn parse_header(&self, py: Python, data: &PyBytes) -> PyResult<ReplayHeader> {
         let mut bytes = data.as_bytes();
-        Ok(ReplayHeader(py.allow_threads(|| convert_result(self.parser.parse_header(&mut bytes)))?))
+        Ok(ReplayHeader(py.allow_threads(|| {
+            convert_result(self.parser.parse_header(&mut bytes))
+        })?))
     }
     /// Parse a replay body. This implies that the header has already been parsed in order for
     /// `data` to be at the correct offset.
     #[text_signature = "(data)"]
     fn parse_body(&self, py: Python, data: &PyBytes) -> PyResult<ReplayBody> {
         let mut bytes = data.as_bytes();
-        Ok(ReplayBody(py.allow_threads(|| convert_result(self.parser.parse_body(&mut bytes)))?))
+        Ok(ReplayBody(py.allow_threads(|| {
+            convert_result(self.parser.parse_body(&mut bytes))
+        })?))
     }
 }

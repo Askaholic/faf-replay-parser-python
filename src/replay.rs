@@ -1,6 +1,6 @@
+use crate::lua::{table_into_py, LuaObject};
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict};
-use crate::lua::{LuaObject, table_into_py};
 
 pub struct Replay(pub faf_replay_parser::scfa::replay::Replay);
 pub struct ReplayHeader(pub faf_replay_parser::scfa::replay::ReplayHeader);
