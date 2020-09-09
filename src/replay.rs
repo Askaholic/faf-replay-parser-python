@@ -1,14 +1,22 @@
-use faf_replay_parser::scfa::replay::*;
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict};
+use crate::lua::{LuaObject, table_into_py};
+
+pub struct Replay(pub faf_replay_parser::scfa::replay::Replay);
+pub struct ReplayHeader(pub faf_replay_parser::scfa::replay::ReplayHeader);
+pub struct ReplayBody(pub faf_replay_parser::scfa::replay::ReplayBody);
+pub struct SimData(pub faf_replay_parser::scfa::replay::SimData);
+pub struct ReplayCommand(pub faf_replay_parser::scfa::replay::ReplayCommand);
+pub struct Position(pub faf_replay_parser::scfa::replay::Position);
+pub struct Target(pub faf_replay_parser::scfa::replay::Target);
 
 impl IntoPy<PyObject> for Replay {
     fn into_py(self, py: Python) -> PyObject {
         let res = PyDict::new(py);
 
-        res.set_item::<&str, PyObject>("header", self.header.into_py(py))
+        res.set_item::<&str, PyObject>("header", ReplayHeader(self.0.header).into_py(py))
             .unwrap();
-        res.set_item::<&str, PyObject>("body", self.body.into_py(py))
+        res.set_item::<&str, PyObject>("body", ReplayBody(self.0.body).into_py(py))
             .unwrap();
 
         res.into_py(py)
@@ -19,21 +27,21 @@ impl IntoPy<PyObject> for ReplayHeader {
     fn into_py(self, py: Python) -> PyObject {
         let res = PyDict::new(py);
 
-        res.set_item::<&str, String>("scfa_version", self.scfa_version)
+        res.set_item::<&str, String>("scfa_version", self.0.scfa_version)
             .unwrap();
-        res.set_item("replay_version", self.replay_version).unwrap();
-        res.set_item("map_file", self.map_file).unwrap();
-        res.set_item::<&str, PyObject>("mods", self.mods.into_py(py))
+        res.set_item("replay_version", self.0.replay_version).unwrap();
+        res.set_item("map_file", self.0.map_file).unwrap();
+        res.set_item::<&str, PyObject>("mods", LuaObject(self.0.mods).into_py(py))
             .unwrap();
-        res.set_item::<&str, PyObject>("scenario", self.scenario.into_py(py))
+        res.set_item::<&str, PyObject>("scenario", LuaObject(self.0.scenario).into_py(py))
             .unwrap();
-        res.set_item::<&str, PyObject>("players", self.players.into_py(py))
+        res.set_item::<&str, PyObject>("players", self.0.players.into_py(py))
             .unwrap();
-        res.set_item("cheats_enabled", self.cheats_enabled).unwrap();
-        res.set_item("army_count", self.army_count).unwrap();
-        res.set_item::<&str, PyObject>("armies", self.armies.into_py(py))
+        res.set_item("cheats_enabled", self.0.cheats_enabled).unwrap();
+        res.set_item("army_count", self.0.army_count).unwrap();
+        res.set_item::<&str, PyObject>("armies", table_into_py(self.0.armies, py))
             .unwrap();
-        res.set_item("seed", self.seed).unwrap();
+        res.set_item("seed", self.0.seed).unwrap();
 
         res.into_py(py)
     }
@@ -43,9 +51,9 @@ impl IntoPy<PyObject> for ReplayBody {
     fn into_py(self, py: Python) -> PyObject {
         let res = PyDict::new(py);
 
-        res.set_item::<&str, PyObject>("sim", self.sim.into_py(py))
+        res.set_item::<&str, PyObject>("sim", SimData(self.0.sim).into_py(py))
             .unwrap();
-        res.set_item::<&str, PyObject>("commands", self.commands.into_py(py))
+        res.set_item::<&str, PyObject>("commands", self.0.commands.into_iter().map(|c| ReplayCommand(c)).collect::<Vec<ReplayCommand>>().into_py(py))
             .unwrap();
 
         res.into_py(py)
@@ -56,16 +64,16 @@ impl IntoPy<PyObject> for SimData {
     fn into_py(self, py: Python) -> PyObject {
         let res = PyDict::new(py);
 
-        res.set_item("tick", self.tick).unwrap();
-        res.set_item("command_source", self.command_source).unwrap();
-        res.set_item("players_last_tick", self.players_last_tick)
+        res.set_item("tick", self.0.tick).unwrap();
+        res.set_item("command_source", self.0.command_source).unwrap();
+        res.set_item("players_last_tick", self.0.players_last_tick)
             .unwrap();
         // Bytes are copied
-        res.set_item("checksum", PyBytes::new(py, &self.checksum))
+        res.set_item("checksum", PyBytes::new(py, &self.0.checksum))
             .unwrap();
-        res.set_item("checksum_tick", self.checksum_tick).unwrap();
-        res.set_item("desync_tick", self.desync_tick).unwrap();
-        res.set_item("desync_ticks", self.desync_ticks).unwrap();
+        res.set_item("checksum_tick", self.0.checksum_tick).unwrap();
+        res.set_item("desync_tick", self.0.desync_tick).unwrap();
+        res.set_item("desync_ticks", self.0.desync_ticks).unwrap();
 
         res.into_py(py)
     }
@@ -73,10 +81,10 @@ impl IntoPy<PyObject> for SimData {
 
 impl IntoPy<PyObject> for ReplayCommand {
     fn into_py(self, py: Python) -> PyObject {
-        use ReplayCommand::*;
+        use faf_replay_parser::scfa::replay::ReplayCommand::*;
         let res = PyDict::new(py);
 
-        match self {
+        match self.0 {
             Advance { ticks } => {
                 res.set_item("name", "Advance").unwrap();
                 res.set_item("ticks", ticks).unwrap();
@@ -105,7 +113,7 @@ impl IntoPy<PyObject> for ReplayCommand {
             CreateProp { blueprint, position } => {
                 res.set_item("name", "CreateProp").unwrap();
                 res.set_item("blueprint", blueprint).unwrap();
-                res.set_item::<&str, PyObject>("position", position.into_py(py))
+                res.set_item::<&str, PyObject>("position", Position(position).into_py(py))
                     .unwrap();
             }
             DestroyEntity { unit } => {
@@ -146,7 +154,7 @@ impl IntoPy<PyObject> for ReplayCommand {
             SetCommandTarget { id, target } => {
                 res.set_item("name", "SetCommandTarget").unwrap();
                 res.set_item("id", id).unwrap();
-                res.set_item::<&str, PyObject>("target", target.into_py(py))
+                res.set_item::<&str, PyObject>("target", Target(target).into_py(py))
                     .unwrap();
             }
             SetCommandType { id, type_ } => {
@@ -157,9 +165,9 @@ impl IntoPy<PyObject> for ReplayCommand {
             SetCommandCells { id, cells, position } => {
                 res.set_item("name", "SetCommandCells").unwrap();
                 res.set_item("id", id).unwrap();
-                res.set_item::<&str, PyObject>("cells", cells.into_py(py))
+                res.set_item::<&str, PyObject>("cells", LuaObject(cells).into_py(py))
                     .unwrap();
-                res.set_item::<&str, PyObject>("position", position.into_py(py))
+                res.set_item::<&str, PyObject>("position", Position(position).into_py(py))
                     .unwrap();
             }
             RemoveCommandFromQueue { id, unit } => {
@@ -170,7 +178,7 @@ impl IntoPy<PyObject> for ReplayCommand {
             DebugCommand { command, position, focus_army, selection } => {
                 res.set_item("name", "DebugCommand").unwrap();
                 res.set_item("command", command).unwrap();
-                res.set_item::<&str, PyObject>("position", position.into_py(py))
+                res.set_item::<&str, PyObject>("position", Position(position).into_py(py))
                     .unwrap();
                 res.set_item("focus_army", focus_army).unwrap();
                 res.set_item("selection", selection).unwrap();
@@ -182,7 +190,7 @@ impl IntoPy<PyObject> for ReplayCommand {
             LuaSimCallback { func, args, selection } => {
                 res.set_item("name", "LuaSimCallback").unwrap();
                 res.set_item("func", func).unwrap();
-                res.set_item::<&str, PyObject>("args", args.into_py(py))
+                res.set_item::<&str, PyObject>("args", LuaObject(args).into_py(py))
                     .unwrap();
                 res.set_item("selection", selection).unwrap();
             }
@@ -197,9 +205,9 @@ impl IntoPy<PyObject> for Position {
     fn into_py(self, py: Python) -> PyObject {
         let res = PyDict::new(py);
 
-        res.set_item("x", self.x).unwrap();
-        res.set_item("y", self.y).unwrap();
-        res.set_item("z", self.z).unwrap();
+        res.set_item("x", self.0.x).unwrap();
+        res.set_item("y", self.0.y).unwrap();
+        res.set_item("z", self.0.z).unwrap();
 
         res.into_py(py)
     }
@@ -207,16 +215,16 @@ impl IntoPy<PyObject> for Position {
 
 impl IntoPy<PyObject> for Target {
     fn into_py(self, py: Python) -> PyObject {
-        use Target::*;
+        use faf_replay_parser::scfa::replay::Target::*;
 
-        match self {
+        match self.0 {
             None => py.None(),
             Entity { id } => {
                 let res = PyDict::new(py);
                 res.set_item("id", id).unwrap();
                 res.into_py(py)
             }
-            Position(p) => p.into_py(py),
+            Position(p) => self::Position(p).into_py(py),
         }
     }
 }

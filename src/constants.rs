@@ -1,4 +1,4 @@
-use crate::scfa::replay::replay_command;
+use faf_replay_parser::scfa::replay::replay_command;
 use pyo3::prelude::*;
 use pyo3::wrap_pymodule;
 

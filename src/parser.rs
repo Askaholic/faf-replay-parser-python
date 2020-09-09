@@ -3,7 +3,10 @@ use pyo3::prelude::*;
 use pyo3::type_object::PyTypeInfo;
 use pyo3::types::{PyBytes, PyList, PyLong, PyTuple};
 
-use faf_replay_parser::scfa::{Parser, ParserBuilder, Replay, ReplayBody, ReplayHeader};
+use crate::convert_result;
+use crate::replay::{Replay, ReplayBody, ReplayHeader};
+
+use faf_replay_parser::scfa::{Parser, ParserBuilder};
 
 #[pyclass(name = Parser)]
 pub struct ParserWrap {
@@ -61,20 +64,20 @@ impl ParserWrap {
     #[text_signature = "(data)"]
     fn parse(&self, py: Python, data: &PyBytes) -> PyResult<Replay> {
         let mut bytes = data.as_bytes();
-        Ok(py.allow_threads(|| self.parser.parse(&mut bytes))?)
+        Ok(Replay(py.allow_threads(|| convert_result(self.parser.parse(&mut bytes)))?))
     }
 
     /// Parse a replay header
     #[text_signature = "(data)"]
     fn parse_header(&self, py: Python, data: &PyBytes) -> PyResult<ReplayHeader> {
         let mut bytes = data.as_bytes();
-        Ok(py.allow_threads(|| self.parser.parse_header(&mut bytes))?)
+        Ok(ReplayHeader(py.allow_threads(|| convert_result(self.parser.parse_header(&mut bytes)))?))
     }
     /// Parse a replay body. This implies that the header has already been parsed in order for
     /// `data` to be at the correct offset.
     #[text_signature = "(data)"]
     fn parse_body(&self, py: Python, data: &PyBytes) -> PyResult<ReplayBody> {
         let mut bytes = data.as_bytes();
-        Ok(py.allow_threads(|| self.parser.parse_body(&mut bytes))?)
+        Ok(ReplayBody(py.allow_threads(|| convert_result(self.parser.parse_body(&mut bytes)))?))
     }
 }
