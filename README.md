@@ -64,7 +64,7 @@ parser = Parser(
 with open("12345.scfareplay", "rb") as f:
     data = f.read()
 
-# Parse to a python dictionary. Data must by exactly of type `bytes`
+# Parse to a python dictionary. Data must of type `bytes` or `bytearray`
 replay = parser.parse(data)
 print("Game time:", timedelta(milliseconds=replay["body"]["sim"]["tick"]*100))
 if replay["body"]["sim"]["desync_ticks"]:

@@ -1,6 +1,5 @@
-use pyo3::exceptions::TypeError;
+use pyo3::exceptions::PyTypeError;
 use pyo3::prelude::*;
-use pyo3::type_object::PyTypeInfo;
 use pyo3::types::{PyBytes, PyLong};
 
 use crate::convert_result;
@@ -8,7 +7,7 @@ use crate::replay::{Replay, ReplayBody, ReplayHeader};
 
 use faf_replay_parser::scfa::{Parser, ParserBuilder};
 
-#[pyclass(name = Parser)]
+#[pyclass(name = "Parser")]
 pub struct ParserWrap {
     parser: Parser,
 }
@@ -31,11 +30,11 @@ impl ParserWrap {
             };
             for any in seq
                 .iter()
-                .map_err(|_| TypeError::py_err("'commands' must be iterable"))?
+                .map_err(|_| PyTypeError::new_err("'commands' must be iterable"))?
             {
                 commands.push(
                     any?.downcast::<PyLong>()
-                        .map_err(|_| TypeError::py_err("command must be an integer"))?
+                        .map_err(|_| PyTypeError::new_err("command must be an integer"))?
                         .extract()?,
                 );
             }

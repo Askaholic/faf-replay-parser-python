@@ -1,12 +1,9 @@
 extern crate faf_replay_parser;
 extern crate pyo3;
 
-use pyo3::conversion::AsPyPointer;
 use pyo3::create_exception;
 use pyo3::exceptions;
-use pyo3::ffi;
 use pyo3::prelude::*;
-use pyo3::type_object::PyTypeInfo;
 use pyo3::types::{PyByteArray, PyBytes};
 use pyo3::wrap_pyfunction;
 use std::io::ErrorKind;
@@ -20,7 +17,7 @@ mod replay;
 
 struct ReplayReadError(faf_replay_parser::ReplayReadError);
 
-create_exception!(fafreplay, PyReplayReadError, exceptions::Exception);
+create_exception!(fafreplay, PyReplayReadError, exceptions::PyException);
 create_exception!(fafreplay, PyReplayDesyncedError, PyReplayReadError);
 
 fn convert_error(obj: faf_replay_parser::ReplayReadError) -> PyErr {
@@ -28,14 +25,14 @@ fn convert_error(obj: faf_replay_parser::ReplayReadError) -> PyErr {
 
     match obj {
         IO(ref e) if e.kind() == ErrorKind::UnexpectedEof => {
-            PyErr::new::<exceptions::EOFError, _>(format!("{}", e))
+            PyErr::new::<exceptions::PyEOFError, _>(format!("{}", e))
         }
         IO(e) => PyErr::from(e),
         MalformedUtf8(e) => {
             let gil = Python::acquire_gil();
             let py = gil.python();
             PyErr::from_instance(
-                exceptions::UnicodeDecodeError::new_utf8(py, e.as_bytes(), e.utf8_error()).unwrap(),
+                exceptions::PyUnicodeDecodeError::new_utf8(py, e.as_bytes(), e.utf8_error()).unwrap(),
             )
         }
         Desynced(tick) => PyErr::new::<PyReplayDesyncedError, _>(tick),
@@ -63,16 +60,16 @@ impl From<faf_replay_parser::ReplayReadError> for ReplayReadError {
 #[pyfunction]
 #[text_signature = "(replay)"]
 fn body_offset(any: &PyAny) -> PyResult<usize> {
-    if PyBytes::is_instance(any) {
+    if any.is_instance::<PyBytes>()? {
         let bytes = any.downcast::<PyBytes>().unwrap();
         return Ok(convert_result(scfa::body_offset(bytes.as_bytes()))?);
-    } else if PyByteArray::is_instance(any) {
+    } else if any.is_instance::<PyByteArray>()? {
         let _py = Python::acquire_gil();
         let bytearray = any.downcast::<PyByteArray>().unwrap();
         return unsafe { Ok(convert_result(scfa::body_offset(bytearray.as_bytes()))?) };
     }
 
-    Err(PyErr::new::<exceptions::TypeError, _>(
+    Err(PyErr::new::<exceptions::PyTypeError, _>(
         "'replay' must be bytes or bytearray",
     ))
 }
@@ -84,16 +81,16 @@ fn body_offset(any: &PyAny) -> PyResult<usize> {
 #[pyfunction]
 #[text_signature = "(body)"]
 fn body_ticks(any: &PyAny) -> PyResult<u32> {
-    if PyBytes::is_instance(any) {
+    if any.is_instance::<PyBytes>()? {
         let bytes = any.downcast::<PyBytes>().unwrap();
         return Ok(convert_result(scfa::body_ticks(bytes.as_bytes()))?);
-    } else if PyByteArray::is_instance(any) {
+    } else if any.is_instance::<PyByteArray>()? {
         let _py = Python::acquire_gil();
         let bytearray = any.downcast::<PyByteArray>().unwrap();
         return unsafe { Ok(convert_result(scfa::body_ticks(bytearray.as_bytes()))?) };
     }
 
-    Err(PyErr::new::<exceptions::TypeError, _>(
+    Err(PyErr::new::<exceptions::PyTypeError, _>(
         "'body' must be bytes or bytearray",
     ))
 }

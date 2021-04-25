@@ -1,6 +1,6 @@
 [package]
 name = "faf-replay-parser-python"
-version = "0.4.0"
+version = "0.5.1"
 authors = ["Askaholic"]
 license = "LGPL-3.0"
 edition = "2018"
@@ -12,5 +12,9 @@ name = "fafreplay"
 crate-type = ["lib", "cdylib"]
 
 [dependencies]
-faf-replay-parser = { path = "../faf-replay-parser" }
-pyo3 = { version = "0.11", features = ["extension-module"] }
+faf-replay-parser = "0.5.1"
+pyo3 = { version = "0.13" }
+
+[features]
+extension-module = ["pyo3/extension-module"]
+default = ["extension-module"]
