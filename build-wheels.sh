@@ -1,14 +1,11 @@
 #!/bin/bash
 set -ex
 
-curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
+curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
 export PATH="$HOME/.cargo/bin:$PATH"
 
-
-for PYBIN in /opt/python/{cp36-cp36m,cp37-cp37m,cp38-cp38m,cp39-cp39m}/bin; do
-    export PYTHON_SYS_EXECUTABLE="$PYBIN/python"
-
-    "${PYBIN}/pip" install -U setuptools wheel==0.31.1 setuptools-rust
+for PYBIN in /opt/python/cp{35,36,37,38,39}*/bin; do
+    "${PYBIN}/pip" install -U setuptools wheel setuptools-rust
     "${PYBIN}/python" setup.py bdist_wheel
 done
 
