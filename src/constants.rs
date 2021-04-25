@@ -34,6 +34,8 @@ pub fn add_constants(m: &PyModule) -> PyResult<()> {
         m.add(NAMES[END_GAME as usize], END_GAME)?;
         m.add("MAX", MAX)?;
 
+        m.add("NAMES", NAMES)?;
+
         Ok(())
     }
 
