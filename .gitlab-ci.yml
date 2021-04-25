@@ -1,4 +1,4 @@
-image: python:3-slim
+image: python:3.7-slim
 
 stages:
   - test
@@ -14,8 +14,8 @@ test:
     - source $HOME/.cargo/env
     - pip install pipenv
     - pipenv sync --dev
-    - cargo build --lib --features python
-    - cargo test
+    - cargo build --lib
+    - cargo test --no-default-features
     - ln -s target/debug/libfafreplay.so ./fafreplay.so
     - pipenv run tests -m "not release"
   only:
