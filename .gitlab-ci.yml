@@ -19,6 +19,7 @@ test:
     - ln -s target/debug/libfafreplay.so ./fafreplay.so
     - pipenv run tests -m "not release"
   only:
+    - master
     - merge_requests
     - tags
 
