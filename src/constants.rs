@@ -32,6 +32,7 @@ pub fn add_constants(m: &PyModule) -> PyResult<()> {
         m.add(NAMES[EXECUTE_LUA_IN_SIM as usize], EXECUTE_LUA_IN_SIM)?;
         m.add(NAMES[LUA_SIM_CALLBACK as usize], LUA_SIM_CALLBACK)?;
         m.add(NAMES[END_GAME as usize], END_GAME)?;
+        m.add("MAX", MAX)?;
 
         Ok(())
     }
