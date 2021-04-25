@@ -23,7 +23,7 @@ test:
     - tags
 
 build-wheels:
-  image: quay.io/pypa/manylinux2010_x86_64
+  image: quay.io/pypa/manylinux2014_x86_64
   stage: deploy
   script:
     - ./build-wheels.sh
