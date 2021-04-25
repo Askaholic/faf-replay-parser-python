@@ -84,10 +84,10 @@ done on replay `6176549` (an almost 50 minute long Seton's game).
 ...     commands=[commands.Advance],
 ...     save_commands=False
 ... )
-timeit.timeit("parser.parse_body(body_data)['sim']['tick']", globals=globals(), number=100)
-1.525173360016197
+>>> timeit.timeit("parser.parse_body(body_data)['sim']['tick']", globals=globals(), number=100)
+1.4510237049980788
 >>> timeit.timeit("body_ticks(body_data)", globals=globals(), number=100)
-0.20764156704535708
+0.20173147800232982
 ```
 
 In this case `body_ticks` turned out to be more than 7x faster than using a
