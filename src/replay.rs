@@ -1,6 +1,7 @@
 use crate::lua::{table_into_py, LuaObject};
 use pyo3::prelude::*;
 use pyo3::types::{PyBytes, PyDict};
+use faf_replay_parser::scfa::replay::GameCommand;
 
 pub struct Replay(pub faf_replay_parser::scfa::replay::Replay);
 pub struct ReplayHeader(pub faf_replay_parser::scfa::replay::ReplayHeader);
@@ -9,6 +10,7 @@ pub struct SimData(pub faf_replay_parser::scfa::replay::SimData);
 pub struct ReplayCommand(pub faf_replay_parser::scfa::replay::ReplayCommand);
 pub struct Position(pub faf_replay_parser::scfa::replay::Position);
 pub struct Target(pub faf_replay_parser::scfa::replay::Target);
+pub struct Formation(pub faf_replay_parser::scfa::replay::Formation);
 
 impl IntoPy<PyObject> for Replay {
     fn into_py(self, py: Python) -> PyObject {
@@ -135,11 +137,11 @@ impl IntoPy<PyObject> for ReplayCommand {
             }
             IssueCommand(game_command) => {
                 res.set_item("name", "IssueCommand").unwrap();
-                // TODO: Copy all game command items to res
+                set_game_command_items(res, game_command, py);
             }
             IssueFactoryCommand(game_command) => {
                 res.set_item("name", "IssueFactoryCommand").unwrap();
-                // TODO: Copy all game command items to res
+                set_game_command_items(res, game_command, py);
             }
             IncreaseCommandCount { id, delta } => {
                 res.set_item("name", "IncreaseCommandCount").unwrap();
@@ -201,6 +203,23 @@ impl IntoPy<PyObject> for ReplayCommand {
     }
 }
 
+fn set_game_command_items(res: &PyDict, game_command: GameCommand, py: Python) {
+    res.set_item("entity_ids", game_command.entity_ids).unwrap();
+    res.set_item("id", game_command.id).unwrap();
+    res.set_item("coordinated_attack_cmd_id", game_command.coordinated_attack_cmd_id).unwrap();
+    res.set_item("type", game_command.type_).unwrap();
+    res.set_item("arg2", game_command.arg2).unwrap();
+    res.set_item::<&str, PyObject>("target", Target(game_command.target).into_py(py)).unwrap();
+    res.set_item("arg3", game_command.arg3).unwrap();
+    res.set_item::<&str, PyObject>("formation", game_command.formation.map(|f| Formation(f)).into_py(py)).unwrap();
+    res.set_item("blueprint", game_command.blueprint).unwrap();
+    res.set_item("arg4", game_command.arg4).unwrap();
+    res.set_item("arg5", game_command.arg5).unwrap();
+    res.set_item("arg6", game_command.arg6).unwrap();
+    res.set_item::<&str, PyObject>("upgrades", LuaObject(game_command.upgrades).into_py(py)).unwrap();
+    res.set_item("clear_queue", game_command.clear_queue).unwrap();
+}
+
 impl IntoPy<PyObject> for Position {
     fn into_py(self, py: Python) -> PyObject {
         let res = PyDict::new(py);
@@ -226,5 +245,19 @@ impl IntoPy<PyObject> for Target {
             }
             Position(p) => self::Position(p).into_py(py),
         }
+    }
+}
+
+impl IntoPy<PyObject> for Formation {
+    fn into_py(self, py: Python) -> PyObject {
+        let res = PyDict::new(py);
+
+        res.set_item("a", self.0.a).unwrap();
+        res.set_item("b", self.0.b).unwrap();
+        res.set_item("c", self.0.c).unwrap();
+        res.set_item("d", self.0.d).unwrap();
+        res.set_item("scale", self.0.scale).unwrap();
+
+        res.into_py(py)
     }
 }
