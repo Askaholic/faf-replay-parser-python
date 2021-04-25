@@ -15,7 +15,7 @@ setup(
     description=package["description"],
     long_description=open("README.md").read(),
     long_description_content_type='text/markdown',
-    url="https://gitlab.com/Askaholic/faf-replay-parser-python",
+    url="https://github.com/Askaholic/faf-replay-parser-python",
     rust_extensions=[RustExtension(
         cargo["lib"]["name"],
         binding=Binding.PyO3

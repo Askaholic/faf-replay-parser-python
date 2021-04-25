@@ -1,0 +1,37 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install dependencies with pipenv
+        run: |
+          pip install pipenv
+          pipenv sync --dev
+
+      - name: Build dev library
+        run: |
+          cargo build --lib
+          ln -s target/debug/libfafreplay.so ./fafreplay.so
+
+      - run: cargo test --no-default-features
+      - run: pipenv run tests -m "not release"
