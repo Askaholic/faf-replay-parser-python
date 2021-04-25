@@ -9,7 +9,7 @@ with open("Cargo.toml") as f:
 package = cargo["package"]
 
 setup(
-    name=package["name"],
+    name="faf-replay-parser",
     version=package["version"],
     author=re.match(r"(\w+).*(<.*>)?", package["authors"][0]).group(1),
     description=package["description"],
