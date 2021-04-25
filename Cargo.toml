@@ -1,5 +1,6 @@
 [package]
 name = "faf-replay-parser-python"
+description = "Python bindings for faf-replay-parser"
 version = "0.5.1"
 authors = ["Askaholic"]
 license = "LGPL-3.0"
