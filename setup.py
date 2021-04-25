@@ -15,6 +15,7 @@ setup(
     description=package["description"],
     long_description=open("README.md").read(),
     long_description_content_type='text/markdown',
+    license="License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     url="https://github.com/Askaholic/faf-replay-parser-python",
     rust_extensions=[RustExtension(
         cargo["lib"]["name"],
