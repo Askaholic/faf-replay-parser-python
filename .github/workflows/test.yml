@@ -9,13 +9,16 @@ on:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
 
     steps:
       - uses: actions/checkout@v2
 
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python-version }}
 
       - uses: actions-rs/toolchain@v1
         with:
@@ -26,7 +29,7 @@ jobs:
       - name: Install dependencies with pipenv
         run: |
           pip install pipenv
-          pipenv sync --dev
+          pipenv sync --dev --python ${{ matrix.python-version }}
 
       - name: Build dev library
         run: |
