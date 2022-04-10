@@ -55,7 +55,7 @@ impl ParserWrap {
     }
 
     /// Parse a replay
-    #[text_signature = "(data)"]
+    #[pyo3(text_signature = "(data)")]
     fn parse(&self, py: Python, data: &PyBytes) -> PyResult<Replay> {
         let mut bytes = data.as_bytes();
         Ok(Replay(py.allow_threads(|| {
@@ -64,7 +64,7 @@ impl ParserWrap {
     }
 
     /// Parse a replay header
-    #[text_signature = "(data)"]
+    #[pyo3(text_signature = "(data)")]
     fn parse_header(&self, py: Python, data: &PyBytes) -> PyResult<ReplayHeader> {
         let mut bytes = data.as_bytes();
         Ok(ReplayHeader(py.allow_threads(|| {
@@ -73,7 +73,7 @@ impl ParserWrap {
     }
     /// Parse a replay body. This implies that the header has already been parsed in order for
     /// `data` to be at the correct offset.
-    #[text_signature = "(data)"]
+    #[pyo3(text_signature = "(data)")]
     fn parse_body(&self, py: Python, data: &PyBytes) -> PyResult<ReplayBody> {
         let mut bytes = data.as_bytes();
         Ok(ReplayBody(py.allow_threads(|| {
