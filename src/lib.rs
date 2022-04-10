@@ -31,8 +31,9 @@ fn convert_error(obj: faf_replay_parser::ReplayReadError) -> PyErr {
         MalformedUtf8(e) => {
             let gil = Python::acquire_gil();
             let py = gil.python();
-            PyErr::from_instance(
-                exceptions::PyUnicodeDecodeError::new_utf8(py, e.as_bytes(), e.utf8_error()).unwrap(),
+            PyErr::from_value(
+                exceptions::PyUnicodeDecodeError::new_utf8(py, e.as_bytes(), e.utf8_error())
+                    .unwrap(),
             )
         }
         Desynced(tick) => PyErr::new::<PyReplayDesyncedError, _>(tick),
@@ -58,12 +59,12 @@ impl From<faf_replay_parser::ReplayReadError> for ReplayReadError {
 /// Find the offset at which the body starts by parsing the header.
 /// Raises `ReplayReadError` if the header data is malformed.
 #[pyfunction]
-#[text_signature = "(replay)"]
+#[pyo3(text_signature = "(replay)")]
 fn body_offset(any: &PyAny) -> PyResult<usize> {
-    if any.is_instance::<PyBytes>()? {
+    if any.is_instance_of::<PyBytes>()? {
         let bytes = any.downcast::<PyBytes>().unwrap();
         return Ok(convert_result(scfa::body_offset(bytes.as_bytes()))?);
-    } else if any.is_instance::<PyByteArray>()? {
+    } else if any.is_instance_of::<PyByteArray>()? {
         let _py = Python::acquire_gil();
         let bytearray = any.downcast::<PyByteArray>().unwrap();
         return unsafe { Ok(convert_result(scfa::body_offset(bytearray.as_bytes()))?) };
@@ -79,12 +80,12 @@ fn body_offset(any: &PyAny) -> PyResult<usize> {
 /// Count the number of ticks in the replay body without checking for desyncs.
 /// Raises `ReplayReadError` if the body data is malformed.
 #[pyfunction]
-#[text_signature = "(body)"]
+#[pyo3(text_signature = "(body)")]
 fn body_ticks(any: &PyAny) -> PyResult<u32> {
-    if any.is_instance::<PyBytes>()? {
+    if any.is_instance_of::<PyBytes>()? {
         let bytes = any.downcast::<PyBytes>().unwrap();
         return Ok(convert_result(scfa::body_ticks(bytes.as_bytes()))?);
-    } else if any.is_instance::<PyByteArray>()? {
+    } else if any.is_instance_of::<PyByteArray>()? {
         let _py = Python::acquire_gil();
         let bytearray = any.downcast::<PyByteArray>().unwrap();
         return unsafe { Ok(convert_result(scfa::body_ticks(bytearray.as_bytes()))?) };
