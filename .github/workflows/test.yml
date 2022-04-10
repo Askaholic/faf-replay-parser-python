@@ -26,15 +26,7 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Install dependencies with pipenv
-        run: |
-          pip install pipenv
-          pipenv sync --dev --python ${{ matrix.python-version }}
-
-      - name: Build dev library
-        run: |
-          cargo build --lib
-          ln -s target/debug/libfafreplay.so ./fafreplay.so
+      - run: pip install tox tox-gh-actions
 
       - run: cargo test --no-default-features
-      - run: pipenv run tests -m "not release"
+      - run: tox
