@@ -1,5 +1,5 @@
 # FAF Replay Parser
-![Build Status](https://github.com/Askaholic/faf-replay-parser-python/actions/workflows/test.yml/badge.svg?branch=master)
+![Build Status](https://github.com/Askaholic/faf-replay-parser-python/actions/workflows/test.yml/badge.svg?branch=main)
 [![pypi](https://badge.fury.io/py/faf-replay-parser.svg)](https://badge.fury.io/py/faf-replay-parser)
 
 A fast library for parsing Supreme Commander Forged Alliance replay files.
