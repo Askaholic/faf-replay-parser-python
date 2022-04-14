@@ -31,7 +31,7 @@ jobs:
         env:
           CIBW_BEFORE_ALL_LINUX: "curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y"
           CIBW_ENVIRONMENT: 'PATH="$PATH:$HOME/.cargo/bin"'
-          CIBW_SKIP: cp36-*
+          CIBW_SKIP: 'cp36-* *-musllinux*'
 
       - uses: actions/upload-artifact@v2
         with:
