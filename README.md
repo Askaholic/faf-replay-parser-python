@@ -1,12 +1,13 @@
 # FAF Replay Parser
 ![Build Status](https://github.com/Askaholic/faf-replay-parser-python/actions/workflows/test.yml/badge.svg?branch=main)
-[![pypi](https://badge.fury.io/py/faf-replay-parser.svg)](https://badge.fury.io/py/faf-replay-parser)
+[![pypi](https://badge.fury.io/py/faf-replay-parser.svg)](https://pypi.python.org/pypi/faf-replay-parser)
+![Supported Python Versions](https://img.shields.io/pypi/pyversions/faf-replay-parser.svg)
 
 A fast library for parsing Supreme Commander Forged Alliance replay files.
 
 ## Installation
-Currently, pre-built packages are only available for Linux. You can install them
-with:
+Pre-built packages are available for Linux, MacOS, and Windows. You can install
+them with:
 
 ```
 pip install faf-replay-parser
