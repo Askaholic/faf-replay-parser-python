@@ -1,3 +1,10 @@
-/target
+# Python files
+*.pyc
+*.egg-info
+build
+.tox
 .venv
-fafreplay.so
+
+# Rust Files
+target
+*.so
