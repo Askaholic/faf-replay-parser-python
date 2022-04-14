@@ -98,7 +98,7 @@ fn body_ticks(any: &PyAny) -> PyResult<u32> {
 
 /// Supreme Commander Forged Alliance replay parser
 #[pymodule]
-fn fafreplay(py: Python, m: &PyModule) -> PyResult<()> {
+fn _fafreplay(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<parser::ParserWrap>()?;
     m.add("ReplayReadError", py.get_type::<PyReplayReadError>())?;
     m.add(

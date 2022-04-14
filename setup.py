@@ -13,7 +13,7 @@ setup(
     author=re.match(r"(\w+).*(<.*>)?", package["authors"][0]).group(1),
     description=package["description"],
     rust_extensions=[RustExtension(
-        cargo["lib"]["name"],
+        "_" + cargo["lib"]["name"],
         binding=Binding.PyO3
     )],
     zip_safe=False,
