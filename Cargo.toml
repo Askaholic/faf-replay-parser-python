@@ -14,7 +14,7 @@ crate-type = ["lib", "cdylib"]
 
 [dependencies]
 faf-replay-parser = "0.5.2"
-pyo3 = { version = "0.16" }
+pyo3 = { git = "https://github.com/pyo3/pyo3", branch = "main" }
 
 [features]
 extension-module = ["pyo3/extension-module"]

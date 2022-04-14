@@ -3,6 +3,9 @@ name: Deploy
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - pyo3-main-test
 
 jobs:
   build_wheels:
@@ -53,16 +56,16 @@ jobs:
           with:
             path: dist/*.tar.gz
 
-  upload_pypi:
-      needs: [build_wheels, build_sdist]
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/download-artifact@v2
-          with:
-            name: artifact
-            path: dist
-
-        - uses: pypa/gh-action-pypi-publish@master
-          with:
-            user: __token__
-            password: ${{ secrets.pypi_password }}
+  # upload_pypi:
+  #     needs: [build_wheels, build_sdist]
+  #     runs-on: ubuntu-latest
+  #     steps:
+  #       - uses: actions/download-artifact@v2
+  #         with:
+  #           name: artifact
+  #           path: dist
+  #
+  #       - uses: pypa/gh-action-pypi-publish@master
+  #         with:
+  #           user: __token__
+  #           password: ${{ secrets.pypi_password }}
