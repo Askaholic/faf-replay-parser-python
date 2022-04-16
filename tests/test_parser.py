@@ -2,6 +2,7 @@ from time import perf_counter
 from typing import List
 
 import pytest
+
 from fafreplay import Parser, ReplayReadError, commands
 
 
