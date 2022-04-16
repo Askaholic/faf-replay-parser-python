@@ -1,4 +1,4 @@
-from _fafreplay import *
+from fafreplay._fafreplay import *
 
 import base64
 import json
