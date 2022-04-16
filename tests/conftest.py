@@ -14,7 +14,7 @@ def pytest_configure(config):
 
 @pytest.fixture
 def replay() -> bytes:
-    with open("tests/data/6176549.scfareplay", "rb") as f:
+    with open("tests/data/8653680.scfareplay", "rb") as f:
         return f.read()
 
 

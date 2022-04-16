@@ -77,7 +77,7 @@ if replay["body"]["sim"]["desync_ticks"]:
 
 ### Benchmark comparison
 To see how much faster the basic functions can be, consider this simple example
-done on replay `6176549` (an almost 50 minute long Seton's game).
+done on replay `8653680` (an almost 50 minute long Seton's game).
 
 ```python
 >>> len(body_data)

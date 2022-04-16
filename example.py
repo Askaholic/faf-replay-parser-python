@@ -23,7 +23,7 @@ def main():
     )
 
     # Read replay to a `bytes` object
-    with open("tests/data/6176549.scfareplay", "rb") as f:
+    with open("tests/data/8653680.scfareplay", "rb") as f:
         data = f.read()
 
     # Parse replay
