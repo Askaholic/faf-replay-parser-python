@@ -96,3 +96,32 @@ done on replay `8653680` (an almost 50 minute long Seton's game).
 
 In this case `body_ticks` turned out to be more than 7x faster than using a
 `Parser`.
+
+### Reading .fafreplay files
+Replays downloaded from [faforever.com](https://faforever.com) use a compressed
+data format to reduce the size of the files. These can be decompressed to the
+original `.scfareplay` data using the `extract_scfa` function.
+
+```python
+from fafreplay import extract_scfa
+
+
+with open("12345.scfareplay", "rb") as f:
+    scfa_data = f.read()
+
+with open("12345.fafreplay", "rb") as f:
+    faf_data = extract_scfa(f)
+
+# The extracted data is in the .scfareplay format
+assert faf_data == scfa_data
+```
+
+Note that there are several versions of the `.fafreplay` format. Version 1 uses
+base64 and zlib compression which are both part of the python standard library.
+However, version 2 uses `zstd` which must be installed through a third party
+package. To ensure that this dependency is installed you can use the `faf` extra
+when installing the parser:
+
+```
+pip install "faf-replay-parser[faf]"
+```
